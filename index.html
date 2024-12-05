@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur d'URL UTM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-6">Générateur d'URL avec paramètres UTM</h1>
+
+        <form id="utmForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">URL de base*</label>
+                <input type="url" id="baseUrl" required onkeypress="return event.charCode !== 32"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <p id="baseUrlError" class="text-red-500 text-sm hidden">URL invalide</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Source UTM*</label>
+                <input type="text" id="utmSource" required pattern="[a-z0-9]+" onkeypress="return event.charCode !== 32"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Campagne UTM*</label>
+                <input type="text" id="utmCampaign" required pattern="[a-z0-9]+"
+                    onkeypress="return event.charCode !== 32"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Medium UTM*</label>
+                <input type="text" id="utmMedium" required pattern="[a-z0-9]+" onkeypress="return event.charCode !== 32"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Contenu UTM</label>
+                <input type="text" id="utmContent" pattern="[a-z0-9]+" onkeypress="return event.charCode !== 32"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Terme UTM</label>
+                <input type="text" id="utmTerm" pattern="[a-z0-9]+" onkeypress="return event.charCode !== 32"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            </div>
+
+            <button type="submit"
+                class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                Générer l'URL
+            </button>
+        </form>
+
+        <div id="result" class="mt-6 hidden">
+            <h2 class="text-lg font-semibold mb-2">URL générée :</h2>
+            <div class="bg-gray-50 p-4 rounded-md">
+                <p id="generatedUrl" class="break-all"></p>
+            </div>
+            <button id="copyButton"
+                class="mt-2 bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                Copier l'URL
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('utmForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Récupération et nettoyage des valeurs
+            const baseUrl = document.getElementById('baseUrl').value.trim();
+            const utmSource = document.getElementById('utmSource').value.trim();
+            const utmCampaign = document.getElementById('utmCampaign').value.trim();
+            const utmMedium = document.getElementById('utmMedium').value.trim();
+            const utmContent = document.getElementById('utmContent').value.trim();
+            const utmTerm = document.getElementById('utmTerm').value.trim();
+
+            // Validation de l'URL
+            try {
+                new URL(baseUrl);
+            } catch {
+                document.getElementById('baseUrlError').classList.remove('hidden');
+                return;
+            }
+
+            // Construction de l'URL
+            const url = new URL(baseUrl);
+            url.searchParams.set('utm_source', utmSource);
+            url.searchParams.set('utm_campaign', utmCampaign);
+            url.searchParams.set('utm_medium', utmMedium);
+            if (utmContent) url.searchParams.set('utm_content', utmContent);
+            if (utmTerm) url.searchParams.set('utm_term', utmTerm);
+
+            // Affichage du résultat
+            document.getElementById('result').classList.remove('hidden');
+            document.getElementById('generatedUrl').textContent = url.toString();
+        });
+
+        document.getElementById('copyButton').addEventListener('click', function () {
+            const urlText = document.getElementById('generatedUrl').textContent;
+            navigator.clipboard.writeText(urlText).then(() => {
+                this.textContent = 'URL copiée !';
+                setTimeout(() => {
+                    this.textContent = 'Copier l\'URL';
+                }, 2000);
+            });
+        });
+
+        // Validation en temps réel des champs
+        const inputs = document.querySelectorAll('input[pattern]');
+        inputs.forEach(input => {
+            input.addEventListener('input', function () {
+                const pattern = new RegExp('^' + this.getAttribute('pattern') + '$');
+                if (!pattern.test(this.value) && this.value !== '') {
+                    this.classList.add('border-red-500');
+                } else {
+                    this.classList.remove('border-red-500');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
