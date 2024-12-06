@@ -5,68 +5,167 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Générateur d'URL UTM</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --color-1: #fff;
+            --color-2: #000;
+            --color-3: #a4dbe8;
+            --color-4: #bde9c9;
+            --color-5: #decde7;
+            --color-6: #f8e08e;
+            --color-7: #f4f4f4;
+            --color-8: #595959;
+            --color-9: #dadada;
+            --color-10: #268095;
+            --color-11: #e8f6f9;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--color-1);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            height: 4rem;
+            background-color: var(--color-3);
+            padding: 2rem;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            color: var(--color-2);
+            text-align: left;
+            margin-top: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0px auto;
+            background-color: var(--color-1);
+            padding: 2rem 2rem 0px;
+        }
+
+        label {
+            display: block;
+            font-size: 1rem;
+            font-weight: medium;
+            color: var(--color-2);
+            margin-bottom: 0.5rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid var(--color-9);
+            margin-bottom: 1rem;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            border-color: var(--color-2);
+            outline: none;
+        }
+
+        button {
+            width: 200px;
+            background-color: var(--color-2);
+            color: var(--color-1);
+            padding: 1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .result {
+            display: none;
+            padding: 2rem;
+            background-color: var(--color-7);
+            margin-bottom: 2rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .result h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--color-2);
+            text-transform: uppercase;
+        }
+
+        .result p {
+            word-break: break-all;
+            color: var(--color-2);
+        }
+
+        .error {
+            color: red;
+            font-size: 0.875rem;
+            display: none;
+        }
+
+        input.input-error,
+        input.input-error:focus,
+        input.input-error:active {
+            border: 1px solid red;
+        }
+    </style>
 </head>
 
-<body class="bg-gray-100 p-8">
-    <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
-        <h1 class="text-2xl font-bold mb-6">Générateur d'URL avec paramètres UTM</h1>
+<body>
+    <header>
+        <h1>Générateur d'URL avec paramètres UTM</h1>
+    </header>
+    <div class="container">
+        <div id="result" class="result">
+            <h2>URL générée :</h2>
+            <p id="generatedUrl"></p>
+            <button id="copyButton" class="copy-button">Copier l'URL</button>
+        </div>
 
-        <form id="utmForm" class="space-y-4">
+        <form id="utmForm">
             <div>
-                <label class="block text-sm font-medium text-gray-700">URL de base*</label>
-                <input type="url" id="baseUrl" required onkeypress="return event.charCode !== 32"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                <p id="baseUrlError" class="text-red-500 text-sm hidden">URL invalide</p>
+                <label>URL de base*</label>
+                <input type="url" id="baseUrl" required onkeypress="return event.charCode !== 32">
+                <p id="baseUrlError" class="error">URL invalide</p>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700">Source UTM*</label>
-                <input type="text" id="utmSource" required pattern="[a-z0-9]+" onkeypress="return event.charCode !== 32"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <label>Source UTM*</label>
+                <input type="text" id="utmSource" required pattern="[a-z0-9_-]+"
+                    onkeypress="return event.charCode !== 32">
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700">Campagne UTM*</label>
-                <input type="text" id="utmCampaign" required pattern="[a-z0-9]+"
-                    onkeypress="return event.charCode !== 32"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <label>Campagne UTM*</label>
+                <input type="text" id="utmCampaign" required pattern="[a-z0-9_-]+"
+                    onkeypress="return event.charCode !== 32">
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700">Medium UTM*</label>
-                <input type="text" id="utmMedium" required pattern="[a-z0-9]+" onkeypress="return event.charCode !== 32"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <label>Medium UTM*</label>
+                <input type="text" id="utmMedium" required pattern="[a-z0-9_-]+"
+                    onkeypress="return event.charCode !== 32">
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700">Contenu UTM</label>
-                <input type="text" id="utmContent" pattern="[a-z0-9]+" onkeypress="return event.charCode !== 32"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <label>Contenu UTM</label>
+                <input type="text" id="utmContent" pattern="[a-z0-9_-]+" onkeypress="return event.charCode !== 32">
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700">Terme UTM</label>
-                <input type="text" id="utmTerm" pattern="[a-z0-9]+" onkeypress="return event.charCode !== 32"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <label>Terme UTM</label>
+                <input type="text" id="utmTerm" pattern="[a-z0-9_-]+" onkeypress="return event.charCode !== 32">
             </div>
 
-            <button type="submit"
-                class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                Générer l'URL
-            </button>
+            <button type="submit">Générer l'URL</button>
         </form>
 
-        <div id="result" class="mt-6 hidden">
-            <h2 class="text-lg font-semibold mb-2">URL générée :</h2>
-            <div class="bg-gray-50 p-4 rounded-md">
-                <p id="generatedUrl" class="break-all"></p>
-            </div>
-            <button id="copyButton"
-                class="mt-2 bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-                Copier l'URL
-            </button>
-        </div>
     </div>
 
     <script>
@@ -85,7 +184,7 @@
             try {
                 new URL(baseUrl);
             } catch {
-                document.getElementById('baseUrlError').classList.remove('hidden');
+                document.getElementById('baseUrlError').style.display = 'block';
                 return;
             }
 
@@ -98,7 +197,7 @@
             if (utmTerm) url.searchParams.set('utm_term', utmTerm);
 
             // Affichage du résultat
-            document.getElementById('result').classList.remove('hidden');
+            document.getElementById('result').style.display = 'block';
             document.getElementById('generatedUrl').textContent = url.toString();
         });
 
@@ -117,10 +216,11 @@
         inputs.forEach(input => {
             input.addEventListener('input', function () {
                 const pattern = new RegExp('^' + this.getAttribute('pattern') + '$');
+                this.value = this.value.replace(/\s/g, '');
                 if (!pattern.test(this.value) && this.value !== '') {
-                    this.classList.add('border-red-500');
+                    this.classList.add('input-error');
                 } else {
-                    this.classList.remove('border-red-500');
+                    this.classList.remove('input-error');
                 }
             });
         });
