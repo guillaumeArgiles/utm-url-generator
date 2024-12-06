@@ -107,12 +107,15 @@
             color: red;
             font-size: 0.875rem;
             display: none;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
         }
 
         input.input-error,
         input.input-error:focus,
         input.input-error:active {
             border: 1px solid red;
+            margin-bottom: 0px;
         }
     </style>
 </head>
@@ -139,28 +142,38 @@
                 <label>Source UTM*</label>
                 <input type="text" id="utmSource" required pattern="[a-z0-9_-]+"
                     onkeypress="return event.charCode !== 32">
+                <span id="utmSourceHelp" class="error" style="display: none;">Veuillez utiliser uniquement des lettres
+                    minuscules, des chiffres, des tirets ou des underscores.</span>
             </div>
 
             <div>
                 <label>Campagne UTM*</label>
                 <input type="text" id="utmCampaign" required pattern="[a-z0-9_-]+"
                     onkeypress="return event.charCode !== 32">
+                <span id="utmCampaignHelp" class="error" style="display: none;">Veuillez utiliser uniquement des lettres
+                    minuscules, des chiffres, des tirets ou des underscores.</span>
             </div>
 
             <div>
                 <label>Medium UTM*</label>
                 <input type="text" id="utmMedium" required pattern="[a-z0-9_-]+"
                     onkeypress="return event.charCode !== 32">
+                <span id="utmMediumHelp" class="error" style="display: none;">Veuillez utiliser uniquement des lettres
+                    minuscules, des chiffres, des tirets ou des underscores.</span>
             </div>
 
             <div>
                 <label>Contenu UTM</label>
                 <input type="text" id="utmContent" pattern="[a-z0-9_-]+" onkeypress="return event.charCode !== 32">
+                <span id="utmContentHelp" class="error" style="display: none;">Veuillez utiliser uniquement des lettres
+                    minuscules, des chiffres, des tirets ou des underscores.</span>
             </div>
 
             <div>
                 <label>Terme UTM</label>
                 <input type="text" id="utmTerm" pattern="[a-z0-9_-]+" onkeypress="return event.charCode !== 32">
+                <span id="utmTermHelp" class="error" style="display: none;">Veuillez utiliser uniquement des lettres
+                    minuscules, des chiffres, des tirets ou des underscores.</span>
             </div>
 
             <button type="submit">Générer l'URL</button>
@@ -214,13 +227,17 @@
         // Validation en temps réel des champs
         const inputs = document.querySelectorAll('input[pattern]');
         inputs.forEach(input => {
+            const helpTextId = input.id + 'Help';
             input.addEventListener('input', function () {
                 const pattern = new RegExp('^' + this.getAttribute('pattern') + '$');
                 this.value = this.value.replace(/\s/g, '');
+                const helpText = document.getElementById(helpTextId);
                 if (!pattern.test(this.value) && this.value !== '') {
                     this.classList.add('input-error');
+                    helpText.style.display = 'block'; // Afficher le message d'aide
                 } else {
                     this.classList.remove('input-error');
+                    helpText.style.display = 'none'; // Masquer le message d'aide
                 }
             });
         });
